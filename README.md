@@ -58,3 +58,9 @@ What you need to implement:
 - A solution that meets the above requirements.
 - You should consider the scalability in your solution, we will add new providers in the future in a minimum amount of change and without affecting the current working providers. You should consider the differences in the data structure between the providers and how to unify the data after getting the result from the provider.
 - **There is no need to**  **use a database**  **in your solution, just mock the result, you can just**  **return a few**  **records for each provider.**
+
+
+**Technology Set**
+PHP programing language , version 7
+Laravel framework , version 8
+MySQL database
