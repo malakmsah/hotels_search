@@ -4,7 +4,7 @@ namespace App\Repositories;
 
 use App\Models\Rooms;
 
-class HotelRoomsRepository
+class RoomsRepository
 {
     public function __construct()
     {
