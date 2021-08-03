@@ -13,14 +13,19 @@ class HotelsController extends Controller
      */
     private $hotelService;
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function getAvailable(Request $request): \Illuminate\Http\JsonResponse
     {
-
+        // load parameters
         $fromDate = $request->input('fromDate');
         $toDate = $request->input('toDate');
         $city = $request->input('city');
         $numberOfAdults = $request->input('numberOfAdults');
 
+        // Validate Parameters
         $validate = $request->validate([
             'fromDate' => 'required|date',
             'toDate' => 'required|date',
@@ -33,7 +38,7 @@ class HotelsController extends Controller
         }
 
         try {
-
+            // Get available hotels
             $data = $this->getHotelsService()->getAvailableHotels($fromDate, $toDate, $city, $numberOfAdults);
             return response()->json($data);
 

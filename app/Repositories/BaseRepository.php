@@ -10,7 +10,7 @@ class BaseRepository
     /**
      * The repository model
      *
-     * @var \Illuminate\Database\Eloquent\Model
+     * @var Model
      */
     protected $model;
 
@@ -19,7 +19,7 @@ class BaseRepository
      * @param array|null $criteria
      * @return array
      */
-    public function all(array $criteria = null, $pluck = null)
+    public function all(array $criteria = null, $pluck = null): array
     {
         if (!empty($pluck)) {
             return $this->get($criteria)->pluck($pluck)->all();
@@ -30,12 +30,16 @@ class BaseRepository
     /**
      * Get all the specified model records in the database
      *
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @param array|null $criteria
+     * @param int $limit
+     * @param string|null $orderField
+     * @param string $orderDirection
+     * @return Collection
      */
-    public function get($criteria = null, $limit = 10, $orderField = null, $orderDirection = 'asc')
+    public function get(array $criteria = null, int $limit = 10, string $orderField = null, string $orderDirection = 'asc'): Collection
     {
         $model = $this->getModel();
-        if (!emptyArray($criteria)) {
+        if (!empty($criteria)) {
             foreach ($criteria as $field => $value) {
                 $model->where($field, $value);
             }
@@ -49,6 +53,9 @@ class BaseRepository
         return $model->get();
     }
 
+    /**
+     * @return Model
+     */
     protected function getModel(): Model
     {
         return $this->model;
@@ -57,9 +64,10 @@ class BaseRepository
     /**
      * Count the number of specified model records in the database
      *
+     * @param array|null $criteria
      * @return int
      */
-    public function count(array $criteria = null)
+    public function count(array $criteria = null): int
     {
         return $this->get($criteria)->count();
     }
@@ -69,9 +77,9 @@ class BaseRepository
      *
      * @param array $data
      *
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @return Collection
      */
-    public function createMultiple(array $data)
+    public function createMultiple(array $data): Collection
     {
         $models = new Collection();
         foreach ($data as $d) {
@@ -85,9 +93,9 @@ class BaseRepository
      *
      * @param array $data
      *
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return Model
      */
-    public function create(array $data)
+    public function create(array $data): Model
     {
         return $this->getModel()->create($data);
     }
@@ -100,7 +108,7 @@ class BaseRepository
      * @return bool|null
      * @throws \Exception
      */
-    public function deleteById($id)
+    public function deleteById($id): ?bool
     {
         return $this->getById($id)->delete();
     }
@@ -110,9 +118,9 @@ class BaseRepository
      *
      * @param $id
      *
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return Model
      */
-    public function getById($id)
+    public function getById($id): Model
     {
         return $this->getModel()->findOrFail($id);
     }
@@ -120,9 +128,9 @@ class BaseRepository
     /**
      * Get the first specified model record from the database
      *
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return Model
      */
-    public function first()
+    public function first(): Model
     {
         return $this->getModel()->firstOrFail();
     }

@@ -18,4 +18,5 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+// Get available hotels
 Route::middleware('auth:api')->get('/hotels/available', [\App\Http\Controllers\Api\HotelsController::class, 'getAvailable']);

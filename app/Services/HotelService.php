@@ -14,11 +14,11 @@ class HotelService
      * @param string $city
      * @param int $numberOfAdults
      * @param int $providerId
-     * @return mixed
+     * @return array[]|null
      *
      * 1 is the id of the provider (“BestHotels”),
      */
-    public function getAvailableHotels($fromDate, $toDate, string $city, int $numberOfAdults, int $providerId = 1)
+    public function getAvailableHotels($fromDate, $toDate, string $city, int $numberOfAdults, int $providerId = 1): ?array
     {
         $provider = $this->getProviderRepository()->getById($providerId);
 
@@ -31,13 +31,13 @@ class HotelService
                 break;
         }
 
-        return $this->mapResponse($response);
+        return $response;
     }
 
     /**
      * @return ProviderRepository
      */
-    protected function getProviderRepository()
+    protected function getProviderRepository(): ProviderRepository
     {
         return new ProviderRepository();
     }
@@ -45,33 +45,18 @@ class HotelService
     /**
      * @return BestHotelCaller
      */
-    protected function getBestHotelCaller()
+    protected function getBestHotelCaller(): BestHotelCaller
     {
         return new BestHotelCaller();
     }
 
-    /**
-     * In real implementation this should be converted to mapping classes
-     * @param array $response
-     * @return array
-     */
-    protected function mapResponse(array $response): array
-    {
-        $mapped = [];
-        foreach ($response as $index => $entry) {
-            $mapped[$index]['hotelName'] = $entry['hotel'];
-            $mapped[$index]['fare'] = $entry['hotelFare'];
-            $mapped[$index]['amenities'] = !empty(['roomAmenities']) ? explode(',', $entry['roomAmenities']) : null;
-        }
-        return $mapped;
-    }
 
     /**
-     *  In real implementation this should be converted to name generation classes
+     *  In further implementation this should be converted to name generated classes
      * @param $providerName
      * @return void|null
      *
-     *   * */
+     **/
     function callerNameGenerator($providerName)
     {
         $callerName = '\App\Callers\HotelProviders' . '\\' . $providerName;
@@ -83,9 +68,9 @@ class HotelService
     }
 
     /**
-     * @return \App\Repositories\HotelRepository
+     * @return HotelRepository
      */
-    protected function getRepository()
+    protected function getRepository(): HotelRepository
     {
         return new HotelRepository();
     }
