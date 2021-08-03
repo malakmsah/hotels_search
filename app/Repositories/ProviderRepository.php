@@ -2,12 +2,12 @@
 
 namespace App\Repositories;
 
-use App\Models\Hotel;
+use App\Models\Provider;
 
-class HotelRepository
+class ProviderRepository
 {
     public function __construct()
     {
-        $this->model = new Hotel();
+        $this->model = new Provider();
     }
 }
