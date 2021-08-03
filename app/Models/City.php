@@ -5,11 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Hotel extends Model
+class City extends Model
 {
     use HasFactory;
 
-    protected $table = 'hotels';
+    protected $table = 'cities';
 
     /**
      * The model's default values for attributes.
@@ -18,17 +18,14 @@ class Hotel extends Model
      */
     protected $attributes = [
         'name',
-        'city_id',
-        'phone_number',
-        'rating'
+        'country_id',
     ];
 
-
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
-    public function providers()
+    public function country()
     {
-        return $this->hasMany(HotelsProviders::class);
+        return $this->hasOne(Country::class);
     }
 }
