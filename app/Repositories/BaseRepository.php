@@ -21,8 +21,7 @@ class BaseRepository
      */
     public function all(array $criteria = null, $pluck = null)
     {
-        if(!empty($pluck))
-        {
+        if (!empty($pluck)) {
             return $this->get($criteria)->pluck($pluck)->all();
         }
         return $this->get($criteria)->all();

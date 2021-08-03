@@ -4,9 +4,10 @@
  * https://github.com/Bigpoint/http-caller-php
  *
  */
+
 namespace App\Callers;
 
-use \Monolog;
+use Monolog;
 
 class BaseCaller
 {
@@ -29,20 +30,20 @@ class BaseCaller
 
     /**
      * @param Monolog\Logger $logger
-     * @param bool           $verifyTls
+     * @param bool $verifyTls
      */
     public function __construct(Monolog\Logger $logger, $verifyTls = true)
     {
-        $this->logger    = $logger;
+        $this->logger = $logger;
         $this->verifyTls = $verifyTls;
     }
 
     /**
      * @param string $url
-     * @param array  $parameters
-     * @param array  $additionalHeaders
-     * @param bool   $disableCallResultDebugLog
-     * @param int    $logLevelForStatusCode404  Monolog severity values; use Monolog\Logger::WARNING
+     * @param array $parameters
+     * @param array $additionalHeaders
+     * @param bool $disableCallResultDebugLog
+     * @param int $logLevelForStatusCode404 Monolog severity values; use Monolog\Logger::WARNING
      *
      * @return array
      */
@@ -52,7 +53,8 @@ class BaseCaller
         array $additionalHeaders = array(),
         $disableCallResultDebugLog = false,
         $logLevelForStatusCode404 = Monolog\Logger::WARNING
-    ) {
+    )
+    {
         if (0 < \count($parameters)) {
             $url .= '?' . \http_build_query($parameters);
         }
@@ -70,120 +72,8 @@ class BaseCaller
     }
 
     /**
-     * @param string       $url
-     * @param array|string $parameters                assoc array with parameter or http_build_query string
-     * @param array        $additionalHeaders
-     * @param bool         $disableCallResultDebugLog
-     * @param int          $logLevelForStatusCode404  Monolog severity values; use Monolog\Logger::WARNING
-     *
-     * @return array
-     */
-    public function post(
-        $url,
-        $parameters,
-        array $additionalHeaders = array(),
-        $disableCallResultDebugLog = false,
-        $logLevelForStatusCode404 = Monolog\Logger::WARNING
-    ) {
-        $this->logger->addDebug(
-            'calling POST: ' . $url . ' with parameters ' . var_export($parameters, true)
-        );
-
-        $curlHandler = $this->createCurlHandler($url, $additionalHeaders);
-
-        \curl_setopt_array(
-            $curlHandler,
-            array(
-                CURLOPT_POST       => true,
-                CURLOPT_POSTFIELDS => $parameters,
-            )
-        );
-
-        return $this->executeCurl(
-            $curlHandler,
-            $url,
-            $disableCallResultDebugLog,
-            $logLevelForStatusCode404
-        );
-    }
-
-
-    /**
      * @param string $url
-     * @param array  $parameters
-     * @param array  $additionalHeaders
-     * @param bool   $disableCallResultDebugLog
-     * @param int    $logLevelForStatusCode404 Monolog severity values; use Monolog\Logger::WARNING
-     *
-     * @return array
-     */
-    public function put(
-        $url,
-        array $parameters,
-        array $additionalHeaders = array(),
-        $disableCallResultDebugLog = false,
-        $logLevelForStatusCode404 = Monolog\Logger::WARNING
-    ) {
-        $this->logger->addDebug(
-            'calling PUT: ' . $url . ' with parameters ' . var_export($parameters, true)
-        );
-
-        $curlHandler = $this->createCurlHandler($url, $additionalHeaders);
-
-        \curl_setopt_array(
-            $curlHandler,
-            array(
-                CURLOPT_CUSTOMREQUEST => 'PUT',
-                CURLOPT_POSTFIELDS    => \http_build_query($parameters),
-            )
-        );
-
-        return $this->executeCurl(
-            $curlHandler,
-            $url,
-            $disableCallResultDebugLog,
-            $logLevelForStatusCode404
-        );
-    }
-
-    /**
-     * @param string $url
-     * @param array  $additionalHeaders
-     * @param bool   $disableCallResultDebugLog
-     * @param int    $logLevelForStatusCode404 Monolog severity values; use Monolog\Logger::WARNING
-     *
-     * @return array
-     */
-    public function delete(
-        $url,
-        array $additionalHeaders = array(),
-        $disableCallResultDebugLog = false,
-        $logLevelForStatusCode404 = Monolog\Logger::WARNING
-    ) {
-        $this->logger->addDebug(
-            'calling DELETE: ' . $url
-        );
-
-        $curlHandler = $this->createCurlHandler($url, $additionalHeaders);
-
-        \curl_setopt_array(
-            $curlHandler,
-            array(
-                CURLOPT_CUSTOMREQUEST  => 'DELETE',
-            )
-        );
-
-        return $this->executeCurl(
-            $curlHandler,
-            $url,
-            $disableCallResultDebugLog,
-            $logLevelForStatusCode404
-        );
-    }
-
-    /**
-     * @param string $url
-     * @param array  $additionalHeaders
+     * @param array $additionalHeaders
      *
      * @return resource
      */
@@ -194,8 +84,8 @@ class BaseCaller
         \curl_setopt_array(
             $curlHandler,
             array(
-                CURLOPT_URL            => $url,
-                CURLOPT_HEADER         => false,
+                CURLOPT_URL => $url,
+                CURLOPT_HEADER => false,
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_CONNECTTIMEOUT => $this->connectionTimeout,
                 CURLOPT_FOLLOWLOCATION => true,
@@ -228,39 +118,10 @@ class BaseCaller
     }
 
     /**
-     * @param string $url
-     *
-     * @return string
-     */
-    private function removeTokenParameter($url)
-    {
-        $urlData         = \parse_url($url);
-        $queryStringData = array();
-
-        if (false === \array_key_exists('query', $urlData)) {
-            return $url;
-        }
-
-        $oldQueryString  = $urlData['query'];
-
-        \parse_str($urlData['query'], $queryStringData);
-
-        foreach ($queryStringData as $key => $value) {
-            if ('token' === $key || 'access_token' === $key) {
-                unset($queryStringData[$key]);
-            }
-        }
-
-        $newQueryString = \http_build_query($queryStringData);
-
-        return \str_replace($oldQueryString, $newQueryString, $url);
-    }
-
-    /**
      * @param resource $curlHandler
-     * @param string   $url
-     * @param bool     $disableCallResultDebugLog
-     * @param int      $logLevelForStatusCode404
+     * @param string $url
+     * @param bool $disableCallResultDebugLog
+     * @param int $logLevelForStatusCode404
      *
      * @return array
      */
@@ -269,16 +130,17 @@ class BaseCaller
         $url,
         $disableCallResultDebugLog,
         $logLevelForStatusCode404
-    ) {
-        $url        = $this->removeTokenParameter($url);
+    )
+    {
+        $url = $this->removeTokenParameter($url);
         $beforeCall = \microtime(true);
 
-        $result       = \curl_exec($curlHandler);
+        $result = \curl_exec($curlHandler);
         $responseCode = (int)\curl_getinfo($curlHandler, CURLINFO_HTTP_CODE);
-        $curlErrno    = \curl_errno($curlHandler);
-        $curlError    = \curl_error($curlHandler);
+        $curlErrno = \curl_errno($curlHandler);
+        $curlError = \curl_error($curlHandler);
 
-        $afterCall    = \microtime(true);
+        $afterCall = \microtime(true);
         $callDuration = $afterCall - $beforeCall;
 
         $this->logger->addDebug('callDuration: ' . \var_export($callDuration, true) . ' s for url: ' . $url);
@@ -304,12 +166,155 @@ class BaseCaller
         }
 
         $result = array(
-            'body'         => $result,
+            'body' => $result,
             'responseCode' => $responseCode,
         );
 
         \curl_close($curlHandler);
 
         return $result;
+    }
+
+    /**
+     * @param string $url
+     *
+     * @return string
+     */
+    private function removeTokenParameter($url)
+    {
+        $urlData = \parse_url($url);
+        $queryStringData = array();
+
+        if (false === \array_key_exists('query', $urlData)) {
+            return $url;
+        }
+
+        $oldQueryString = $urlData['query'];
+
+        \parse_str($urlData['query'], $queryStringData);
+
+        foreach ($queryStringData as $key => $value) {
+            if ('token' === $key || 'access_token' === $key) {
+                unset($queryStringData[$key]);
+            }
+        }
+
+        $newQueryString = \http_build_query($queryStringData);
+
+        return \str_replace($oldQueryString, $newQueryString, $url);
+    }
+
+    /**
+     * @param string $url
+     * @param array|string $parameters assoc array with parameter or http_build_query string
+     * @param array $additionalHeaders
+     * @param bool $disableCallResultDebugLog
+     * @param int $logLevelForStatusCode404 Monolog severity values; use Monolog\Logger::WARNING
+     *
+     * @return array
+     */
+    public function post(
+        $url,
+        $parameters,
+        array $additionalHeaders = array(),
+        $disableCallResultDebugLog = false,
+        $logLevelForStatusCode404 = Monolog\Logger::WARNING
+    )
+    {
+        $this->logger->addDebug(
+            'calling POST: ' . $url . ' with parameters ' . var_export($parameters, true)
+        );
+
+        $curlHandler = $this->createCurlHandler($url, $additionalHeaders);
+
+        \curl_setopt_array(
+            $curlHandler,
+            array(
+                CURLOPT_POST => true,
+                CURLOPT_POSTFIELDS => $parameters,
+            )
+        );
+
+        return $this->executeCurl(
+            $curlHandler,
+            $url,
+            $disableCallResultDebugLog,
+            $logLevelForStatusCode404
+        );
+    }
+
+    /**
+     * @param string $url
+     * @param array $parameters
+     * @param array $additionalHeaders
+     * @param bool $disableCallResultDebugLog
+     * @param int $logLevelForStatusCode404 Monolog severity values; use Monolog\Logger::WARNING
+     *
+     * @return array
+     */
+    public function put(
+        $url,
+        array $parameters,
+        array $additionalHeaders = array(),
+        $disableCallResultDebugLog = false,
+        $logLevelForStatusCode404 = Monolog\Logger::WARNING
+    )
+    {
+        $this->logger->addDebug(
+            'calling PUT: ' . $url . ' with parameters ' . var_export($parameters, true)
+        );
+
+        $curlHandler = $this->createCurlHandler($url, $additionalHeaders);
+
+        \curl_setopt_array(
+            $curlHandler,
+            array(
+                CURLOPT_CUSTOMREQUEST => 'PUT',
+                CURLOPT_POSTFIELDS => \http_build_query($parameters),
+            )
+        );
+
+        return $this->executeCurl(
+            $curlHandler,
+            $url,
+            $disableCallResultDebugLog,
+            $logLevelForStatusCode404
+        );
+    }
+
+    /**
+     * @param string $url
+     * @param array $additionalHeaders
+     * @param bool $disableCallResultDebugLog
+     * @param int $logLevelForStatusCode404 Monolog severity values; use Monolog\Logger::WARNING
+     *
+     * @return array
+     */
+    public function delete(
+        $url,
+        array $additionalHeaders = array(),
+        $disableCallResultDebugLog = false,
+        $logLevelForStatusCode404 = Monolog\Logger::WARNING
+    )
+    {
+        $this->logger->addDebug(
+            'calling DELETE: ' . $url
+        );
+
+        $curlHandler = $this->createCurlHandler($url, $additionalHeaders);
+
+        \curl_setopt_array(
+            $curlHandler,
+            array(
+                CURLOPT_CUSTOMREQUEST => 'DELETE',
+            )
+        );
+
+        return $this->executeCurl(
+            $curlHandler,
+            $url,
+            $disableCallResultDebugLog,
+            $logLevelForStatusCode404
+        );
     }
 }

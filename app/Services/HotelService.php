@@ -9,11 +9,29 @@ use App\Repositories\ProviderRepository;
 class HotelService
 {
     /**
-     * @return \App\Repositories\HotelRepository
+     * @param $fromDate
+     * @param $toDate
+     * @param string $city
+     * @param int $numberOfAdults
+     * @param int $providerId
+     * @return mixed
+     *
+     * 1 is the id of the provider (“BestHotels”),
      */
-    protected function getRepository()
+    public function getAvailableHotels($fromDate, $toDate, string $city, int $numberOfAdults, int $providerId = 1)
     {
-        return new HotelRepository();
+        $provider = $this->getProviderRepository()->getById($providerId);
+
+        switch ($provider->name) {
+            case 'Best Hotels':
+                $response = $this->getBestHotelCaller()->getAvailableHotels($fromDate, $toDate, $city, $numberOfAdults);
+                break;
+            default:
+                $response = null;
+                break;
+        }
+
+        return $this->mapResponse($response);
     }
 
     /**
@@ -33,34 +51,27 @@ class HotelService
     }
 
     /**
-     * @param $fromDate
-     * @param $toDate
-     * @param $city
-     * @param $numberOfAdults
-     * @param int $providerId
-     * @return mixed
-     *
-     * 1 is the id of the provider (“BestHotels”),
+     * In real implementation this should be converted to mapping classes
+     * @param array $response
+     * @return array
      */
-    public function getAvailableHotels($fromDate, $toDate, string $city, int $numberOfAdults, int $providerId = 1)
+    protected function mapResponse(array $response): array
     {
-        $provider = $this->getProviderRepository()->getById($providerId);
-
-        switch ($provider->name) {
-            case 'Best Hotels':
-                $response = $this->getBestHotelCaller()->getAvailableHotels($fromDate, $toDate, $city, $numberOfAdults);
-                break;
-            default:
-                $response = null;
-                break;
+        $mapped = [];
+        foreach ($response as $index => $entry) {
+            $mapped[$index]['hotelName'] = $entry['hotel'];
+            $mapped[$index]['fare'] = $entry['hotelFare'];
+            $mapped[$index]['amenities'] = !empty(['roomAmenities']) ? explode(',', $entry['roomAmenities']) : null;
         }
-        return $response;
+        return $mapped;
     }
 
     /**
+     *  In real implementation this should be converted to name generation classes
      * @param $providerName
      * @return void|null
-
+     *
+     *   * */
     function callerNameGenerator($providerName)
     {
         $callerName = '\App\Callers\HotelProviders' . '\\' . $providerName;
@@ -70,5 +81,12 @@ class HotelService
             return null;
         }
     }
-     * */
+
+    /**
+     * @return \App\Repositories\HotelRepository
+     */
+    protected function getRepository()
+    {
+        return new HotelRepository();
+    }
 }
