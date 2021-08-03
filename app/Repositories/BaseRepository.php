@@ -19,8 +19,12 @@ class BaseRepository
      * @param array|null $criteria
      * @return array
      */
-    public function all(array $criteria = null)
+    public function all(array $criteria = null, $pluck = null)
     {
+        if(!empty($pluck))
+        {
+            return $this->get($criteria)->pluck($pluck)->all();
+        }
         return $this->get($criteria)->all();
     }
 

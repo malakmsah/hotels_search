@@ -4,7 +4,7 @@ namespace App\Repositories;
 
 use App\Models\Provider;
 
-class ProviderRepository
+class ProviderRepository extends BaseRepository
 {
     public function __construct()
     {

@@ -4,7 +4,7 @@ namespace App\Repositories;
 
 use App\Models\Hotel;
 
-class HotelRepository
+class HotelRepository extends BaseRepository
 {
     public function __construct()
     {
