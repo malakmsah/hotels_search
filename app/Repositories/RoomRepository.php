@@ -2,12 +2,13 @@
 
 namespace App\Repositories;
 
-use App\Models\Rooms;
+use App\Models\Room;
 
-class RoomsRepository
+class RoomRepository
 {
     public function __construct()
     {
-        $this->model = new Rooms();
+        $this->model = new Room();
     }
 }
+

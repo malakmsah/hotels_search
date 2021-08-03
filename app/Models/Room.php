@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Rooms extends Model
+class Room extends Model
 {
     use HasFactory;
 
@@ -25,6 +25,15 @@ class Rooms extends Model
         'fare',
         'amenities',
         'notes'
+    ];
+
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'amenities' => 'array',
     ];
 
     /**
